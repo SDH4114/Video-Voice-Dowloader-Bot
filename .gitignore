@@ -1,0 +1,96 @@
+# ==========================
+# Python
+# ==========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.pdb
+*.log
+*.sqlite3
+*.db
+
+# Виртуальное окружение
+venv/
+.env
+.env.local
+.env.*.local
+
+# Кэш pip и временные файлы
+pip-wheel-metadata/
+build/
+dist/
+*.egg-info/
+.eggs/
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+.cache/
+tmp/
+temp/
+*.tmp
+*.bak
+
+# ==========================
+# Docker
+# ==========================
+# Игнорируем артефакты и мусор Docker
+Dockerfile~
+docker-compose.override.yml
+.docker/
+*.tar
+*.pid
+*.sock
+
+# ==========================
+# OS specific
+# ==========================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ==========================
+# Project specific
+# ==========================
+# Telegram токены, ключи, приватные env-файлы
+.env
+*.key
+*.json
+secret_*.txt
+token_*.txt
+
+# Видео, аудио и временные файлы, создаваемые ботом
+*.mp4
+*.mp3
+*.m4a
+*.webm
+*.part
+*.ytdl
+*.aria2
+*.crdownload
+*.temp
+*.download
+*.partial
+*.cache
+*.log
+
+# Локальные cookie и браузерные данные
+cookies/
+cookies.txt
+
+# ==========================
+# IDE / Editor configs
+# ==========================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
