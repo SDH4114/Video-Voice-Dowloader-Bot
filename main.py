@@ -121,7 +121,7 @@ async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def download_and_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = update.message.text.strip()
     msg = await update.message.reply_text("Скачиваю... проверьте сообщение через минуту.")
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
 
     def ytdl_download(u):
         # Pinterest: попробуем заранее вытащить прямую ссылку из OG-тегов.
@@ -221,7 +221,9 @@ async def download_and_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except:
             pass
 
+
 if __name__ == "__main__":
+    asyncio.set_event_loop(asyncio.new_event_loop())
     app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_cmd))
