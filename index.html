@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video & Audio Downloader</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .supported-sites {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+            font-size: 13px;
+            color: #555;
+            text-align: center;
+        }
+
+        .supported-sites strong {
+            color: #667eea;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+            display: block;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .results {
+            margin-top: 25px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .download-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .download-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .download-card h3::before {
+            content: '';
+            width: 30px;
+            height: 30px;
+            display: inline-block;
+        }
+
+        .video-card h3::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23667eea"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>') center/contain no-repeat;
+        }
+
+        .audio-card h3::before {
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23764ba2"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.01 12 6 14.01 6 16.5S8.01 21 10.5 21c2.31 0 4.2-1.75 4.45-4H15V6h4V3h-7z"/></svg>') center/contain no-repeat;
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .download-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .info-text {
+            color: #666;
+            font-size: 13px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .loader.show {
+            display: block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Video & Audio Downloader</h1>
+        <p class="subtitle">Скачивайте видео и аудио с популярных платформ</p>
+
+        <div class="supported-sites">
+            <strong>Поддерживаемые сайты:</strong> YouTube, TikTok, Instagram, Facebook, Twitter/X, Pinterest, Reddit, Vimeo и многие другие
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="urlInput" placeholder="Вставьте ссылку на видео или аудио..." />
+        </div>
+
+        <button id="downloadBtn" onclick="fetchMedia()">Скачать</button>
+
+        <div class="loader" id="loader"></div>
+        <div class="status" id="status"></div>
+
+        <div class="results" id="results">
+            <div class="download-card video-card">
+                <h3>Видео + Аудио</h3>
+                <a href="#" id="videoLink" class="download-btn" download>Скачать видео (MP4)</a>
+                <p class="info-text">Полное видео с озвучкой</p>
+            </div>
+
+            <div class="download-card audio-card">
+                <h3>Только аудио</h3>
+                <a href="#" id="audioLink" class="download-btn" download>Скачать аудио (MP3)</a>
+                <p class="info-text">Аудиодорожка без видео</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchMedia() {
+            const urlInput = document.getElementById('urlInput');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const status = document.getElementById('status');
+            const results = document.getElementById('results');
+            const loader = document.getElementById('loader');
+            const url = urlInput.value.trim();
+
+            if (!url) {
+                showStatus('Пожалуйста, введите ссылку на видео', 'error');
+                return;
+            }
+
+            downloadBtn.disabled = true;
+            loader.classList.add('show');
+            results.classList.remove('show');
+            showStatus('Обработка ссылки...', 'loading');
+
+            try {
+                const response = await fetch('https://api.cobalt.tools/api/json', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        url: url,
+                        isAudioOnly: false,
+                        aFormat: 'mp3',
+                        filenamePattern: 'basic',
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'error' || data.status === 'rate-limit') {
+                    throw new Error(data.text || 'Не удалось обработать ссылку');
+                }
+
+                if (data.status === 'redirect' || data.status === 'stream') {
+                    const videoUrl = data.url;
+                    
+                    // Получаем аудио отдельно
+                    const audioResponse = await fetch('https://api.cobalt.tools/api/json', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            url: url,
+                            isAudioOnly: true,
+                            aFormat: 'mp3',
+                            filenamePattern: 'basic',
+                        })
+                    });
+
+                    const audioData = await audioResponse.json();
+                    const audioUrl = audioData.url;
+
+                    // Показываем ссылки для скачивания
+                    document.getElementById('videoLink').href = videoUrl;
+                    document.getElementById('audioLink').href = audioUrl;
+
+                    results.classList.add('show');
+                    showStatus('Готово! Нажмите на кнопки ниже для скачивания', 'success');
+                } else if (data.status === 'picker') {
+                    // Несколько вариантов (например, для постов Instagram с несколькими медиа)
+                    if (data.picker && data.picker.length > 0) {
+                        const videoUrl = data.picker[0].url;
+                        
+                        // Получаем аудио
+                        const audioResponse = await fetch('https://api.cobalt.tools/api/json', {
+                            method: 'POST',
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                url: url,
+                                isAudioOnly: true,
+                                aFormat: 'mp3',
+                            })
+                        });
+
+                        const audioData = await audioResponse.json();
+                        const audioUrl = audioData.url;
+
+                        document.getElementById('videoLink').href = videoUrl;
+                        document.getElementById('audioLink').href = audioUrl;
+
+                        results.classList.add('show');
+                        showStatus('Готово! Нажмите на кнопки ниже для скачивания', 'success');
+                    }
+                } else {
+                    throw new Error('Неизвестный формат ответа');
+                }
+
+            } catch (error) {
+                showStatus('Ошибка: ' + error.message + '. Попробуйте другую ссылку или сервис временно недоступен.', 'error');
+            } finally {
+                downloadBtn.disabled = false;
+                loader.classList.remove('show');
+            }
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status ' + type;
+        }
+
+        // Обработка Enter в поле ввода
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                fetchMedia();
+            }
+        });
+    </script>
+</body>
+</html>
